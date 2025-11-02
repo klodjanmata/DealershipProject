@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Search Cars</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Car Dealership</h1>
+
+        <!-- Search form -->
+        <form class="row g-3 mb-4" action="/cars/search" method="get">
+            <div class="col-sm-10 col-md-8 col-lg-6">
+                <input type="text" class="form-control" name="q" placeholder="Search by make or model" 
+                       th:value="${q}">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+            <div class="col-auto">
+                <a href="/cars" class="btn btn-outline-secondary">All Cars</a>
+            </div>
+        </form>
+
+        <div th:if="${q} == null || #strings.isEmpty(q)" class="alert alert-info" role="alert">
+            Enter a term to search by car make or model.
+        </div>
+        <div th:if="${q} != null && !#strings.isEmpty(q) && #lists.isEmpty(cars)" class="alert alert-warning" role="alert">
+            No cars found for "<span th:text="${q}"></span>".
+        </div>
+
+        <div class="table-responsive" th:if="${!#lists.isEmpty(cars)}">
+            <table class="table table-striped table-hover table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Make</th>
+                        <th>Model</th>
+                        <th>Year</th>
+                        <th>Color</th>
+                        <th>Price</th>
+                        <th>Kilometers</th>
+                        <th>Available</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="car : ${cars}">
+                        <td th:text="${car.id}"></td>
+                        <td th:text="${car.make}"></td>
+                        <td th:text="${car.model}"></td>
+                        <td th:text="${car.year}"></td>
+                        <td th:text="${car.color}"></td>
+                        <td th:text="${#numbers.formatDecimal(car.price, 0, 'COMMA', 2, 'POINT') + ' €'}"></td>
+                        <td th:text="${#numbers.formatInteger(car.kilometers, 0, 'COMMA') + ' km'}"></td>
+                        <td>
+                            <span th:if="${car.available}" class="badge bg-success">Yes</span>
+                            <span th:unless="${car.available}" class="badge bg-danger">No</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
