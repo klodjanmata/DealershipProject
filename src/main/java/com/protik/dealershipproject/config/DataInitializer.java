@@ -1,19 +1,30 @@
 package com.protik.dealershipproject.config;
 
 import com.protik.dealershipproject.entity.Car;
+import com.protik.dealershipproject.entity.UserAccount;
+import com.protik.dealershipproject.repository.UserAccountRepository;
 import com.protik.dealershipproject.service.CarService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class DataInitializer implements CommandLineRunner {
-    
-    @Autowired
-    private CarService carService;
-    
+
+    private final CarService carService;
+    private final UserAccountRepository userAccountRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public DataInitializer(CarService carService,
+                           UserAccountRepository userAccountRepository,
+                           PasswordEncoder passwordEncoder) {
+        this.carService = carService;
+        this.userAccountRepository = userAccountRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         if (carService.count() == 0) {
             carService.saveCar(new Car(null, "Toyota", "Camry", 2022, "White", 25000.0, 24000, true));
             carService.saveCar(new Car(null, "Honda", "Accord", 2023, "Black", 29000.0, 8000, true));
@@ -26,6 +37,19 @@ public class DataInitializer implements CommandLineRunner {
             carService.saveCar(new Car(null, "Hyundai", "Elantra", 2023, "Blue", 20000.0, 6000, true));
             carService.saveCar(new Car(null, "Mazda", "CX-5", 2023, "Red", 27000.0, 11000, true));
         }
+
+        if (userAccountRepository.count() == 0) {
+            UserAccount admin = new UserAccount(null,
+                    "admin",
+                    passwordEncoder.encode("admin123"),
+                    "ADMIN");
+            UserAccount user = new UserAccount(null,
+                    "user",
+                    passwordEncoder.encode("user123"),
+                    "USER");
+            userAccountRepository.save(admin);
+            userAccountRepository.save(user);
+        }
+
     }
 }
-
