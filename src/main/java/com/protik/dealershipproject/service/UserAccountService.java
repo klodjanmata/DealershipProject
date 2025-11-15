@@ -1,5 +1,6 @@
 package com.protik.dealershipproject.service;
 
+import com.protik.dealershipproject.dto.UserCreateForm;
 import com.protik.dealershipproject.entity.UserAccount;
 import com.protik.dealershipproject.repository.UserAccountRepository;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,24 +26,25 @@ public class UserAccountService {
     }
 
     @Transactional
-    public UserAccount createUser(String username, String rawPassword, String role) {
-        if (username == null || username.isBlank()) {
+    public UserAccount createUser(UserCreateForm dto) {
+        if (dto.getUsername() == null || dto.getUsername().isBlank()) {
+
             throw new IllegalArgumentException("Username is required");
         }
-        if (rawPassword == null || rawPassword.isBlank()) {
+        if (dto.getPassword() == null || dto.getPassword().isBlank()) {
             throw new IllegalArgumentException("Password is required");
         }
-        String normalizedRole = normalizeRole(role);
+        String normalizedRole = normalizeRole(dto.getRole());
 
-        repository.findByUsername(username.trim())
+        repository.findByUsername(dto.getUsername().trim())
                 .ifPresent(existing -> {
                     throw new IllegalArgumentException("Username already exists");
                 });
 
         try {
             UserAccount user = new UserAccount();
-            user.setUsername(username.trim());
-            user.setPassword(passwordEncoder.encode(rawPassword));
+            user.setUsername(dto.getUsername().trim());
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
             user.setRole(normalizedRole);
             return repository.save(user);
         } catch (DataIntegrityViolationException ex) {

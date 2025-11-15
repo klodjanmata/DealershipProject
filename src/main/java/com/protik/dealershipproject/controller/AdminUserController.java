@@ -40,7 +40,7 @@ public class AdminUserController {
                              Model model) {
         if (!bindingResult.hasErrors()) {
             try {
-                userAccountService.createUser(form.getUsername(), form.getPassword(), form.getRole());
+                userAccountService.createUser(form);
                 return "redirect:/admin/users?created";
             } catch (IllegalArgumentException ex) {
                 bindingResult.rejectValue("username", "userForm.username", ex.getMessage());
